@@ -58,6 +58,8 @@
     .wallet-balance strong { color: var(--coral); font: 500 24px 'DM Mono'; }
     .wallet-label { display: block; margin-top: 22px; color: var(--muted); font: 10px 'DM Mono'; text-transform: uppercase; }
     .wallet-example { color: var(--muted); font-size: 11px; margin-bottom: 0; }
+    .code-status { min-height: 18px; margin: 10px 0 0; color: var(--deep); font: 11px 'DM Mono'; }
+    .toast { z-index: 30; }
     .redeem-section { background: #dff3f7; padding: 70px 5vw; border-top: 1px solid var(--line); }
     .redeem-section-inner { max-width: 600px; margin: auto; text-align: center; }
     .redeem-section h2 { margin: 0 0 12px; color: var(--ink); font-size: clamp(30px, 4vw, 48px); letter-spacing: -1.5px; }
@@ -66,7 +68,52 @@
     .page-redeem-row input { flex: 1; min-width: 0; border: 1px solid var(--line); background: #fff; padding: 14px; font: 14px 'DM Mono'; color: var(--ink); }
     .page-redeem-row button { padding: 0 18px; background: var(--deep); color: #fff; font-size: 12px; }
     .page-redeem-row button:hover { background: var(--coral); }
+    .chat-section { background: #fff; padding: 82px 5vw; border-top: 1px solid var(--line); }
+    .chat-inner { max-width: 900px; margin: auto; }
+    .chat-heading { display: flex; justify-content: space-between; align-items: end; gap: 25px; margin-bottom: 28px; }
+    .chat-heading h2 { margin: 0; color: var(--ink); font-size: clamp(32px, 4vw, 54px); letter-spacing: -1.5px; line-height: 1; }
+    .chat-heading p:not(.eyebrow) { max-width: 260px; color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0; }
+    .chat-board { display: grid; gap: 10px; margin-bottom: 20px; }
+    .chat-message { background: #eaf7fa; border-left: 3px solid var(--water); padding: 15px 17px; }
+    .chat-message strong { color: var(--deep); font-size: 13px; }
+    .chat-message time { color: var(--muted); font: 10px 'DM Mono'; margin-left: 9px; }
+    .chat-message p { color: var(--ink); font-size: 13px; line-height: 1.5; margin: 8px 0 0; }
+    .chat-form { display: grid; grid-template-columns: 145px 1fr auto; gap: 8px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .chat-form input { min-width: 0; border: 1px solid var(--line); padding: 12px; background: #fff; color: var(--ink); font: 12px 'Space Grotesk'; }
+    .chat-form input:nth-child(2) { font-family: 'Space Grotesk'; }
+    .chat-form button { background: var(--deep); color: #fff; padding: 0 18px; font-size: 12px; }
+    .chat-form button:hover { background: var(--coral); }
+    .chat-note { color: var(--muted); font: 10px 'DM Mono'; margin: 12px 0 0; }
+    .group-bar { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 14px 17px; background: var(--deep); color: #fff; margin-bottom: 12px; }
+    .group-bar strong { display: block; font-size: 14px; }
+    .group-bar span { display: block; color: #b9d0d8; font: 10px 'DM Mono'; margin-top: 4px; }
+    .group-settings { display: flex; gap: 7px; }
+    .group-settings button, .attach-button { background: #dff3f7; color: var(--deep); padding: 9px 11px; font-size: 11px; }
+    .group-settings button:hover, .attach-button:hover { background: var(--yellow); }
+    .group-people { display: none; gap: 8px; margin-bottom: 12px; }
+    .group-people.open { display: flex; }
+    .group-people input { flex: 1; min-width: 0; border: 1px solid var(--line); padding: 10px; font-size: 12px; }
+    .group-people button { background: var(--coral); color: #fff; padding: 0 12px; font-size: 11px; }
+    .message-attachment { display: block; max-width: 260px; max-height: 180px; margin-top: 10px; object-fit: cover; }
+    .message-file { display: inline-block; margin-top: 10px; color: var(--deep); font: 11px 'DM Mono'; }
+    .attachment-preview { min-height: 0; color: var(--muted); font: 10px 'DM Mono'; }
+    .chat-compose { display: flex; gap: 8px; align-items: center; padding-top: 18px; border-top: 1px solid var(--line); }
+    .chat-compose .chat-form { flex: 1; border: 0; padding: 0; }
+    .chat-compose .chat-form input { padding: 12px; }
+    @media (max-width: 700px) { .chat-section { padding: 60px 20px; } .chat-heading { display: block; } .chat-heading p:not(.eyebrow) { margin-top: 18px; } .chat-form { grid-template-columns: 1fr; } .chat-form button { padding: 13px; } }
     @media (max-width: 700px) { .redeem-section { padding: 55px 20px; } .page-redeem-row { display: grid; grid-template-columns: 1fr; } .page-redeem-row button { padding: 14px; } }
+    .app-layout { display: flex; min-height: calc(100vh - 78px); }
+    .side-nav { position: sticky; top: 78px; align-self: flex-start; width: 210px; min-width: 210px; height: calc(100vh - 78px); padding: 28px 14px; border-right: 1px solid var(--line); background: rgba(246,251,252,.92); }
+    .side-nav-label { padding: 0 12px 14px; color: var(--muted); font: 10px 'DM Mono'; text-transform: uppercase; letter-spacing: 1px; }
+    .side-link { width: 100%; display: flex; align-items: center; gap: 11px; padding: 13px 12px; background: none; color: var(--muted); text-align: left; font-size: 13px; }
+    .side-link:hover, .side-link.active { background: #dff3f7; color: var(--deep); }
+    .side-icon { width: 23px; text-align: center; color: var(--coral); font: 18px Georgia, serif; }
+    .app-content { min-width: 0; flex: 1; }
+    .side-nav-note { margin: 30px 12px 0; padding-top: 15px; border-top: 1px solid var(--line); color: var(--muted); font: 10px/1.5 'DM Mono'; }
+    .session-actions { display: flex; gap: 8px; }
+    .session-actions button { background: none; border: 1px solid var(--line); color: var(--muted); padding: 8px 10px; font-size: 11px; }
+    .session-actions button:hover { border-color: var(--deep); color: var(--deep); }
+    @media (max-width: 700px) { .app-layout { display: block; } .side-nav { position: sticky; top: 78px; z-index: 2; width: 100%; min-width: 0; height: auto; display: flex; gap: 4px; overflow-x: auto; padding: 8px 12px; border-right: 0; border-bottom: 1px solid var(--line); } .side-nav-label, .side-nav-note { display: none; } .side-link { width: auto; min-width: max-content; padding: 10px 12px; } .side-icon { font-size: 16px; } .session-actions button:first-child { display: none; } .session-actions button { padding: 7px 8px; } }
     .payment-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--muted); font: 10px 'DM Mono'; text-transform: uppercase; }
     .payment-divider:before, .payment-divider:after { content: ''; height: 1px; flex: 1; background: var(--line); }
     .paypal-button { width: 100%; padding: 14px; background: #f2c94c; color: #173b5d; font-size: 13px; font-weight: 600; }
@@ -135,17 +182,17 @@
       <a class="auth-brand" href="#" aria-label="Data Swarm"><span class="brand-mark data-logo"><span class="logo-paper">DATA<br>SWARM</span><span class="logo-hook" aria-hidden="true">S</span></span><span>Data Swarm</span></a>
       <div class="auth-layout">
         <div class="auth-message"><p class="eyebrow">A living library of fish data</p><h1>Follow the<br><em>whole school.</em></h1><p>Discover datasets that make aquatic life visible, one signal at a time.</p><div class="swarm-status"><span></span> The swarm follows your cursor</div></div>
-        <form class="login-card" id="loginForm" novalidate><p class="eyebrow">Welcome back</p><h2>Enter the water</h2><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required><p class="form-error" id="formError" role="alert"></p><button class="login-button" type="submit">Sign in to Data Swarm <span>↗</span></button><p class="login-note">Demo mode: any valid email opens your personal data library.</p></form>
+        <form class="login-card" id="loginForm" novalidate><p class="eyebrow">Welcome back</p><h2>Enter the water</h2><label for="displayName">Your name</label><input id="displayName" name="displayName" type="text" autocomplete="name" maxlength="24" placeholder="Taha" required><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required><p class="form-error" id="formError" role="alert"></p><button class="login-button" type="submit">Sign in to Data Swarm <span>↗</span></button><p class="login-note">Your name appears when you post in Fish Friends.</p></form>
       </div>
     </div>
   </section>
     <div id="appShell" hidden>
   <header class="topbar">
     <a class="brand" href="#top" aria-label="Data Swarm home"><span class="brand-mark data-logo"><span class="logo-paper">DATA<br>SWARM</span><span class="logo-hook" aria-hidden="true">S</span></span><span>Data Swarm</span></a>
-    <nav aria-label="Main navigation"><a href="#catalog">Explore data</a><a href="#about">For researchers</a></nav>
-    <div class="account-actions"><button class="credit-pill" id="creditsButton" type="button">Credits <b id="creditBalance">$0</b></button><button class="cart-button" id="cartButton" type="button"><span>Bag</span><b id="cartCount">0</b></button></div>
+    <nav aria-label="Main navigation"><a href="#catalog">Explore data</a><a href="#about">For researchers</a></nav><div class="session-actions"><button id="welcomeEmailButton" type="button">Email welcome note</button><button id="backToLogin" type="button">Back to login</button></div>
   </header>
 
+  <div class="app-layout"><aside class="side-nav" aria-label="Data Swarm sections"><div class="side-nav-label">Your library</div><button class="side-link active" type="button" data-target="catalog"><span class="side-icon">▦</span>Marketplace</button><button class="side-link" type="button" data-target="fish-chat"><span class="side-icon">◌</span>Messages</button><p class="side-nav-note">Explore fish data and talk with the school.</p></aside><div class="app-content">
   <main id="top">
     <section class="hero">
       <div class="hero-copy">
@@ -170,15 +217,10 @@
     <section class="fish-gallery" aria-labelledby="fishGalleryTitle"><div class="fish-gallery-heading"><div><p class="eyebrow">From the field archive</p><h2 id="fishGalleryTitle">Meet the subjects.</h2></div><p>Real underwater references for the curious minds behind every dataset.</p></div><div class="fish-gallery-grid"><figure class="fish-photo"><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Fish_at_the_great_barrier_reef.jpg" alt="Reef fish at the Great Barrier Reef" loading="eager"><figcaption>Reef fish / coral gardens</figcaption></figure><figure class="fish-photo"><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Shark_underwater.jpg" alt="Shark swimming underwater" loading="eager"><figcaption>Open water / shark routes</figcaption></figure><figure class="fish-photo"><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Mangrove_Jack_Taiwan.jpg" alt="Mangrove Jack fish" loading="eager"><figcaption>Mangrove nurseries / Mangrove Jack</figcaption></figure></div></section>
 
     <section class="about" id="about"><p class="eyebrow">Built for curious minds</p><h2>Data should feel<br><em>alive.</em></h2><p>Data Swarm makes the hidden patterns of aquatic life easier to find and more rewarding to explore. Each collection pairs clean files with context from the people who gathered them.</p><a class="text-link" href="mailto:hello@dataswarm.example">Talk to the swarm ↗</a></section>
-    <section class="redeem-section" id="redeem"><div class="redeem-section-inner"><p class="eyebrow">At the bottom of your library</p><h2>Redeem a code.</h2><p>Enter a project code here to add demo credits to your Data Swarm balance.</p><div class="page-redeem-row"><input id="pageRedeemCode" type="text" autocomplete="off" placeholder="Enter your code" aria-label="Redeem code"><button id="pageRedeemButton" type="button">Add credits</button></div></div></section>
-  </main>
+    <section class="chat-section" id="fish-chat" aria-labelledby="chatTitle"><div class="chat-inner"><div class="chat-heading"><div><p class="eyebrow">Community / fish talk</p><h2 id="chatTitle">Talk with the school.</h2></div><p>Share fish photos, files, and messages with your local group.</p></div><div class="group-bar"><div><strong id="groupName">Fish Friends</strong><span id="groupMembers">3 members</span></div><div class="group-settings"><button id="renameGroup" type="button">Rename</button><button id="addPerson" type="button">Add people</button><button id="clearChat" type="button">Clear chat</button></div></div><div class="group-people" id="groupPeople"><input id="personName" type="text" maxlength="24" placeholder="Person's name" aria-label="Person's name"><button id="addPersonConfirm" type="button">Add</button></div><div class="chat-board" id="chatBoard"></div><div class="chat-compose"><label class="attach-button" for="chatAttachment">Attach</label><input id="chatAttachment" type="file" accept="image/*,.txt,.pdf,.csv" hidden><form class="chat-form" id="chatForm"><input id="chatName" type="text" maxlength="24" placeholder="Your name" aria-label="Your display name" required><input id="chatMessage" type="text" maxlength="240" placeholder="Write a message..." aria-label="Your fish message"><button type="submit">Send</button></form></div><p class="attachment-preview" id="attachmentPreview"></p><p class="chat-note">Local group chat prototype: messages and attachments stay on this device.</p></div></section>
+  </main></div></div>
   <footer><span>© 2026 Data Swarm</span><span>Made for the water-minded</span></footer><div class="wave-footer" aria-hidden="true"></div>
-  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
-  <aside class="cart-drawer" id="cartDrawer" aria-label="Your data bag" aria-hidden="true"><div class="drawer-head"><h2>Your bag</h2><button id="closeCart" type="button" aria-label="Close bag">×</button></div><div class="cart-items" id="cartItems"><p class="empty-cart">Your bag is waiting.<br>Find some data to take home.</p></div><div class="cart-footer"><div><span>Total</span><strong id="cartTotal">$0</strong></div><button class="checkout" id="checkoutButton" type="button" disabled>Continue to checkout</button></div></aside>
-  <div class="payment-modal-backdrop" id="paymentModal" hidden><section class="payment-modal" role="dialog" aria-modal="true" aria-labelledby="paymentTitle"><div class="payment-modal-head"><div><p class="eyebrow">Data Swarm demo credits</p><h2 id="paymentTitle">Take your data home</h2></div><button class="payment-close" id="closePayment" type="button" aria-label="Close payment">×</button></div><p>These credits are only for this project. They are not real money and cannot be withdrawn. A parent or guardian must handle any real card or PayPal payments.</p><p class="payment-secure"><span></span> Your demo balance: <strong id="paymentBalance">$0</strong></p><button class="credit-purchase" id="creditPurchaseButton" type="button">Buy this bag with demo credits</button><div class="payment-divider">add more demo credits</div><p class="redeem-title">Credit code</p><p>Try `00023456` to add $52 demo credits.</p><div class="redeem-row"><input id="redeemCode" type="text" inputmode="numeric" placeholder="Enter code" aria-label="Credit code"><button id="redeemButton" type="button">Add credits</button></div><div class="payment-divider">real payment with an adult</div><button class="payment-continue" id="paymentContinue" type="button">Card payment ↗</button><button class="paypal-button" id="paypalButton" type="button">Pay with PayPal</button></section></div>
-  <div class="download-library-backdrop" id="downloadLibrary" hidden><section class="download-library" role="dialog" aria-modal="true" aria-labelledby="downloadTitle"><div class="download-library-head"><div><p class="eyebrow">Payment complete</p><h2 id="downloadTitle">Your fish data is ready.</h2></div><button class="download-close" id="closeDownloadLibrary" type="button" aria-label="Close downloads">×</button></div><p class="download-library-intro">Download a normal TXT file for each dataset. You can open it and read it in Notepad.</p><div id="downloadItems"></div></section></div>
   <div class="photo-preview-backdrop" id="photoPreview" hidden><section class="photo-preview" role="dialog" aria-modal="true" aria-labelledby="previewTitle"><button class="photo-preview-close" id="closePhotoPreview" type="button" aria-label="Close photo preview">×</button><img id="previewImage" src="" alt=""><div><p class="eyebrow">Photo preview</p><h2 id="previewTitle"></h2><p>Review the fish photo before adding this dataset to your bag.</p><a class="photo-source" id="previewSource" href="#" target="_blank" rel="noreferrer">Open original photo ↗</a></div></section></div>
-  <div class="credits-modal-backdrop" id="creditsModal" hidden><section class="credits-modal" role="dialog" aria-modal="true" aria-labelledby="creditsTitle"><div class="payment-modal-head"><div><p class="eyebrow">Your Data Swarm wallet</p><h2 id="creditsTitle">Redeem a code</h2></div><button class="payment-close" id="closeCredits" type="button" aria-label="Close wallet">×</button></div><p class="wallet-balance">Current demo balance <strong id="walletBalance">$0</strong></p><p>Enter a project code to add virtual credits. These credits are not real money and have no cash value.</p><label class="wallet-label" for="accountCode">Code</label><div class="redeem-row"><input id="accountCode" type="text" autocomplete="off" placeholder="00023456" aria-label="Wallet code"><button id="accountRedeemButton" type="button">Redeem</button></div><p class="wallet-example">Example code: 00023456 adds $52 demo credits.</p></section></div>
   <div class="toast" id="toast" role="status"></div>
   </div>
   <script src="app.js"></script>

@@ -59,23 +59,46 @@ const photoUrls = {
   28: 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Pufferfish.jpg'
 };
 let activeFilter = 'All';
-let bag = [];
-const creditCodes = {'00023456': 52, 'FISH1000': 100, 'OCEAN0025': 25, 'SWARM0075': 75};
-const savedCreditBalance = Number(localStorage.getItem('dataSwarmCredits') || 0);
-let creditBalance = Number.isFinite(savedCreditBalance) && savedCreditBalance >= 0 ? savedCreditBalance : 0;
-let redeemedCodes = new Set();
-try {
-  const storedCodes = JSON.parse(localStorage.getItem('dataSwarmRedeemedCodes') || '[]');
-  redeemedCodes = new Set(Array.isArray(storedCodes) ? storedCodes : []);
-} catch { localStorage.removeItem('dataSwarmRedeemedCodes'); }
+const creditCodes = {
+  '00023456': 52, 'FISH1000': 100, 'OCEAN0025': 25, 'SWARM0075': 75,
+  'TAHA456': 45, 'TAHA458': 45, 'TAHA425': 25, 'TAHA100': 100,
+  'REEF025': 25, 'REEF050': 50, 'REEF075': 75, 'REEF100': 100,
+  'BLUE025': 25, 'BLUE050': 50, 'BLUE075': 75, 'BLUE100': 100,
+  'FISH025': 25, 'FISH050': 50, 'FISH075': 75, 'FISH150': 150,
+  'DATA010': 10, 'DATA025': 25, 'DATA050': 50, 'DATA100': 100,
+  'SWARM010': 10, 'SWARM025': 25, 'SWARM050': 50, 'SWARM100': 100,
+  'TAHA010': 10, 'TAHA020': 20, 'TAHA030': 30, 'TAHA040': 40,
+  'TAHA050': 50, 'TAHA060': 60, 'TAHA070': 70, 'TAHA080': 80,
+  'TAHA090': 90, 'TAHA120': 120, 'TAHA200': 200, 'TAHA250': 250,
+  'OCEAN010': 10, 'OCEAN050': 50, 'OCEAN100': 100, 'OCEAN200': 200,
+  'CORAL010': 10, 'CORAL050': 50, 'CORAL100': 100, 'CORAL200': 200,
+  'FISH010': 10, 'FISH040': 40, 'FISH060': 60, 'FISH080': 80,
+  'BLUE010': 10, 'BLUE040': 40, 'BLUE060': 60, 'BLUE080': 80,
+  'REEF010': 10, 'REEF040': 40, 'REEF060': 60, 'REEF080': 80,
+  'DATA040': 40, 'DATA060': 60, 'DATA080': 80, 'DATA200': 200,
+  'DEEP010': 10, 'DEEP050': 50, 'DEEP100': 100, 'DEEP150': 150,
+  'WATER025': 25, 'WATER075': 75, 'WATER125': 125, 'WATER175': 175,
+  'ALLFISHES10000000': 10000000,
+  'DS7Q4M9X2P8K': 75,
+  'SWM4Z8N2R6T1': 100,
+  'F1SH9V3K7L2Q': 50,
+  'OCE4N8B2W6Y9': 125,
+  'TAH7A3X9M5C1': 250,
+  'REEF6P2D8H4S': 60,
+  'BLUE9K5R1V7N3': 90,
+  'DEEP2J8Q4T6Z1': 150,
+  'DATA5W1F7M3X9': 200,
+  'FISH8C4L6P2R0': 40,
+  'WAVE3N9B5K1Y7': 80,
+  'SEAS2V6H8Q4D0': 300
+};
 const grid = document.querySelector('#productGrid');
 const money = value => `$${value}`;
 
 function renderProducts() {
   const query = document.querySelector('#searchInput').value.toLowerCase().trim();
   const visible = datasets.filter(item => (activeFilter === 'All' || item.category === activeFilter) && `${item.title} ${item.description} ${item.category}`.toLowerCase().includes(query));
-  grid.innerHTML = visible.length ? visible.map(item => `<article class="product"><div class="product-visual ${item.visual}"><img src="${photoUrls[item.id]}" alt="${item.species || item.photoQuery || 'Fish'} photograph" loading="lazy" onerror="this.onerror=null;this.classList.add('photo-unavailable')"><span class="visual-label">${item.category.toUpperCase()} / DS-${String(item.id).padStart(2, '0')}</span><div class="visual-shape"></div><span class="photo-credit">Fish photograph</span></div><div class="product-body"><div class="product-meta"><span>${item.tag}</span><span>CSV · JSON</span></div><h3>${item.title}</h3><p>${item.description}</p><div class="product-buy"><span class="price">${money(item.price)}</span><button class="add-button" data-id="${item.id}" type="button">Add to bag +</button></div></div></article>`).join('') : '<p class="empty-cart">No datasets match that search yet.</p>';
-  grid.querySelectorAll('.add-button').forEach(button => button.addEventListener('click', () => addToBag(Number(button.dataset.id))));
+  grid.innerHTML = visible.length ? visible.map(item => `<article class="product"><div class="product-visual ${item.visual}"><img src="${photoUrls[item.id]}" alt="${item.species || item.photoQuery || 'Fish'} photograph" loading="lazy" onerror="this.onerror=null;this.classList.add('photo-unavailable')"><span class="visual-label">${item.category.toUpperCase()} / DS-${String(item.id).padStart(2, '0')}</span><div class="visual-shape"></div><span class="photo-credit">Fish photograph</span></div><div class="product-body"><div class="product-meta"><span>${item.tag}</span><span>CSV · JSON</span></div><h3>${item.title}</h3><p>${item.description}</p><div class="product-buy"><span class="price">${money(item.price)}</span></div></div></article>`).join('') : '<p class="empty-cart">No datasets match that search yet.</p>';
   grid.querySelectorAll('.product-visual img').forEach(image => image.addEventListener('click', () => openPhotoPreview(image)));
 }
 
@@ -92,139 +115,84 @@ function closePhotoPreview() { document.querySelector('#photoPreview').hidden = 
 document.querySelector('#closePhotoPreview').addEventListener('click', closePhotoPreview);
 document.querySelector('#photoPreview').addEventListener('click', event => { if (event.target.id === 'photoPreview') closePhotoPreview(); });
 
-function addToBag(id) {
-  if (!bag.includes(id)) bag.push(id);
-  updateBag();
-  showToast('Added to your data bag');
-}
-function updateBag() {
-  document.querySelector('#cartCount').textContent = bag.length;
-  const items = document.querySelector('#cartItems');
-  const checkout = document.querySelector('#checkoutButton');
-  if (!bag.length) { items.innerHTML = '<p class="empty-cart">Your bag is waiting.<br>Find some data to take home.</p>'; checkout.disabled = true; } else {
-    items.innerHTML = bag.map(id => { const item = datasets.find(dataset => dataset.id === id); return `<div class="cart-row"><div>${item.title}<small>${item.category} · ${money(item.price)}</small></div><button class="remove" data-id="${id}" type="button">Remove</button></div>`; }).join('');
-    items.querySelectorAll('.remove').forEach(button => button.addEventListener('click', () => { bag = bag.filter(id => id !== Number(button.dataset.id)); updateBag(); }));
-    checkout.disabled = false;
-  }
-  document.querySelector('#cartTotal').textContent = money(bag.reduce((total, id) => total + datasets.find(item => item.id === id).price, 0));
-}
 function showToast(message) { const toast = document.querySelector('#toast'); toast.textContent = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 1800); }
-function toggleCart(open) { document.querySelector('#cartDrawer').classList.toggle('open', open); document.querySelector('#cartDrawer').setAttribute('aria-hidden', String(!open)); document.querySelector('#drawerBackdrop').hidden = !open; }
-function updateCreditBalance() { document.querySelector('#creditBalance').textContent = `$${creditBalance}`; document.querySelector('#paymentBalance').textContent = `$${creditBalance}`; document.querySelector('#walletBalance').textContent = `$${creditBalance}`; }
-function saveCredits() { localStorage.setItem('dataSwarmCredits', creditBalance); updateCreditBalance(); }
-function redeemCreditCode(input) {
-  const code = input.value.trim().toUpperCase();
-  if (redeemedCodes.has(code)) { showToast('That code was already used'); return false; }
-  if (creditCodes[code]) { creditBalance += creditCodes[code]; redeemedCodes.add(code); localStorage.setItem('dataSwarmRedeemedCodes', JSON.stringify([...redeemedCodes])); saveCredits(); input.value = ''; showToast(`Added $${creditCodes[code]} demo credits`); return true; }
-  showToast('That credit code is not valid'); return false;
+const starterMessages = [
+  {name: 'Maya', message: 'Has anyone compared clownfish territory size across different anemones?', time: 'Today'},
+  {name: 'Taha', message: 'The anglerfish photo for Night lights, deep fish is incredible.', time: 'Today'},
+  {name: 'Noah', message: 'I am looking for freshwater fish that can breathe air. Arapaima is fascinating.', time: 'Yesterday'}
+];
+let chatMessages = JSON.parse(localStorage.getItem('dataSwarmChat') || 'null') || starterMessages;
+let groupMembers = JSON.parse(localStorage.getItem('dataSwarmGroupMembers') || 'null') || ['Maya', 'Taha', 'Noah'];
+function escapeChatText(value) { return value.replace(/[&<>"']/g, character => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[character])); }
+function renderChat() {
+  document.querySelector('#chatBoard').innerHTML = chatMessages.map(item => { const attachment = item.attachment ? (item.attachment.type.startsWith('image/') ? `<img class="message-attachment" src="${item.attachment.data}" alt="${escapeChatText(item.attachment.name)}">` : `<a class="message-file" href="${item.attachment.data}" download="${escapeChatText(item.attachment.name)}">Download ${escapeChatText(item.attachment.name)}</a>`) : ''; return `<article class="chat-message"><strong>${escapeChatText(item.name)}</strong><time>${escapeChatText(item.time)}</time>${item.message ? `<p>${escapeChatText(item.message)}</p>` : ''}${attachment}</article>`; }).join('');
 }
-function downloadFile(filename, content, type) {
-  const blob = new Blob([content], {type});
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob); link.download = filename; link.click();
-  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-}
-const referenceData = {
-  1: ['Mixed reef fish community', 'Tropical coral reef', 'Varies by species', '0-40 m', 'Algae, plankton, and small invertebrates', 'Species richness and coral health are linked.'],
-  2: ['Arapaima gigas', 'Amazon floodplain lakes and rivers', 'Up to about 3 m', '0-5 m', 'Fish, crustaceans, and small animals', 'Must surface to breathe air.'],
-  3: ['Mixed pelagic fish community', 'Open ocean surface waters', 'Varies by species', '0-200 m', 'Plankton and smaller fish', 'Schools reduce individual predation risk.'],
-  4: ['Melanocetus johnsonii', 'Deep ocean midnight zone', 'Up to about 20 cm', '200-2,000 m', 'Small fish and crustaceans', 'Uses a bioluminescent lure to attract prey.'],
-  5: ['Arapaima gigas', 'Amazon basin rivers and floodplains', 'Up to about 3 m', '0-5 m', 'Fish and crustaceans', 'One of the world’s largest freshwater fish.'],
-  6: ['Coral reef community', 'Shallow tropical reef', 'Varies by species', '0-30 m', 'Algae, plankton, and reef invertebrates', 'Heat stress can cause coral bleaching.'],
-  7: ['Sebastes species', 'Temperate kelp forests', 'Up to about 90 cm', '5-275 m', 'Small fish, shrimp, and squid', 'Many rockfish mature slowly and live for decades.'],
-  8: ['Salmo salar', 'Cold rivers and North Atlantic', 'Up to about 1.5 m', '0-200 m at sea', 'Insects, crustaceans, and small fish', 'Adults return to freshwater to spawn.'],
-  9: ['Small schooling fish community', 'Coastal reef and open water', 'Usually under 20 cm', '0-100 m', 'Plankton', 'Dense schools change direction together.'],
-  10: ['Mangrove-associated juvenile fish', 'Mangrove roots and tidal creeks', 'Varies by species', '0-10 m', 'Plankton, insects, and tiny crustaceans', 'Mangrove roots provide shelter from predators.'],
-  11: ['Silurus glanis', 'Deep lakes and slow rivers', 'Up to about 2.7 m', '1-30 m', 'Fish, crayfish, birds, and mammals', 'A large nocturnal freshwater predator.'],
-  12: ['Thunnus orientalis', 'Temperate and tropical open ocean', 'Up to about 3 m', '0-1,000 m', 'Fish, squid, and crustaceans', 'A warm-bodied, fast-swimming predator.'],
-  13: ['Amphiprion ocellaris', 'Sea anemones on tropical reefs', 'Up to about 11 cm', '1-15 m', 'Algae, plankton, and small crustaceans', 'Lives in a mutual partnership with anemones.'],
-  14: ['Paracanthurus hepatus', 'Indo-Pacific coral reefs', 'Up to about 31 cm', '2-40 m', 'Mostly algae', 'Its sharp tail spine helps deter predators.'],
-  15: ['Reef shark species', 'Tropical reefs and coastal waters', 'Varies by species', '1-300 m', 'Fish, squid, and crustaceans', 'Sharks help structure marine food webs.'],
-  16: ['Hippocampus species', 'Seagrass, coral, and mangrove habitat', 'About 2-35 cm', '1-60 m', 'Tiny crustaceans', 'Males carry developing young in a brood pouch.'],
-  17: ['Mobula birostris', 'Tropical and subtropical ocean', 'Disc width up to about 7 m', '0-1,000 m', 'Plankton and small fish', 'Feeds by filtering large volumes of water.'],
-  18: ['Octopus vulgaris', 'Rocky reefs and coastal seabeds', 'Up to about 1 m', '0-200 m', 'Crabs, shellfish, and fish', 'Can change color and texture for camouflage.'],
-  19: ['Penguin species', 'Cold coastal ocean', 'Varies by species', 'Surface to 500 m', 'Fish, squid, and krill', 'Dense feathers and body shape support deep diving.'],
-  20: ['Salminus brasiliensis', 'Large South American rivers', 'Up to about 1.2 m', '0-20 m', 'Fish and insects', 'A powerful freshwater predator and sport fish.'],
-  21: ['Electrophorus electricus', 'Amazon and Orinoco floodplains', 'Up to about 2.5 m', '0-10 m', 'Fish, amphibians, and invertebrates', 'Produces electric discharges for hunting and defense.'],
-  22: ['Salmo salar', 'Cold rivers and North Atlantic', 'Up to about 1.5 m', '0-200 m at sea', 'Insects, crustaceans, and small fish', 'Migration connects ocean and freshwater ecosystems.'],
-  23: ['Betta splendens', 'Slow freshwater streams and rice paddies', 'Up to about 7 cm', '0-1 m', 'Insects and small aquatic animals', 'Builds bubble nests during reproduction.'],
-  24: ['Antennarius species', 'Tropical reef and rocky seabeds', 'Up to about 45 cm', '1-100 m', 'Fish and crustaceans', 'Uses a modified fin ray as a fishing lure.'],
-  25: ['Rhincodon typus', 'Warm tropical and subtropical ocean', 'Up to about 12 m', '0-1,900 m', 'Plankton, krill, and small fish', 'The world’s largest living fish and a filter feeder.'],
-  26: ['Exocoetidae family', 'Warm ocean surface waters', 'Up to about 45 cm', '0-20 m', 'Plankton and small crustaceans', 'Glides above the water using enlarged fins.'],
-  27: ['Myctophidae family', 'Deep ocean across the world', 'Usually 2-15 cm', '200-1,000 m', 'Plankton and tiny crustaceans', 'Many species migrate toward the surface at night.'],
-  28: ['Tetraodontidae family', 'Tropical and temperate coastal waters', 'Varies by species', '1-250 m', 'Shellfish, algae, and small invertebrates', 'Some species inflate by taking in water when threatened.']
-};
-function downloadDataset(id, format) {
-  const item = datasets.find(dataset => dataset.id === id);
-  const [scientificName, habitat, size, depth, diet, note] = referenceData[item.id];
-  const text = `DATA SWARM - FISH DATASET\n================================\n\nDataset: DS-${String(item.id).padStart(2, '0')}\nTitle: ${item.title}\nCategory: ${item.category}\nField notes: ${item.tag}\n\nREFERENCE DATA\nScientific name: ${scientificName}\nHabitat: ${habitat}\nTypical size: ${size}\nRecorded depth range: ${depth}\nTypical diet: ${diet}\nBehavior or ecology: ${note}\n\nABOUT THIS DATASET\n${item.description}\n\nDATA NOTE\nThese are curated reference facts for learning. They are not a claim that this small prototype contains the full original survey measurements.\n\nPhoto source\n${photoUrls[item.id]}\n`;
-  downloadFile(`data-swarm-${String(id).padStart(2, '0')}.txt`, text, 'text/plain');
-}
-function showDownloadLibrary() {
-  const library = document.querySelector('#downloadLibrary');
-  const items = document.querySelector('#downloadItems');
-  const purchased = bag.map(id => datasets.find(item => item.id === id));
-  items.innerHTML = purchased.map(item => `<article class="download-row"><div><strong>${item.title}</strong><small>DS-${String(item.id).padStart(2, '0')} · ${item.category}</small></div><div class="download-actions"><button type="button" data-download="${item.id}" data-format="txt">Download TXT</button></div></article>`).join('');
-  items.querySelectorAll('[data-download]').forEach(button => button.addEventListener('click', () => downloadDataset(Number(button.dataset.download), button.dataset.format)));
-  library.hidden = false;
-}
-document.querySelector('#closeDownloadLibrary').addEventListener('click', () => { document.querySelector('#downloadLibrary').hidden = true; });
-document.querySelector('#creditsButton').addEventListener('click', () => { document.querySelector('#walletBalance').textContent = `$${creditBalance}`; document.querySelector('#creditsModal').hidden = false; document.querySelector('#accountCode').focus(); });
-document.querySelector('#closeCredits').addEventListener('click', () => { document.querySelector('#creditsModal').hidden = true; });
-document.querySelector('#creditsModal').addEventListener('click', event => { if (event.target.id === 'creditsModal') document.querySelector('#creditsModal').hidden = true; });
-document.querySelector('#accountRedeemButton').addEventListener('click', () => redeemCreditCode(document.querySelector('#accountCode')));
-document.querySelector('#pageRedeemButton').addEventListener('click', () => redeemCreditCode(document.querySelector('#pageRedeemCode')));
-document.querySelector('#accountCode').addEventListener('keydown', event => { if (event.key === 'Enter') redeemCreditCode(event.currentTarget); });
-document.querySelector('#pageRedeemCode').addEventListener('keydown', event => { if (event.key === 'Enter') redeemCreditCode(event.currentTarget); });
+document.querySelector('#chatForm').addEventListener('submit', event => {
+  event.preventDefault();
+  const name = document.querySelector('#chatName');
+  const message = document.querySelector('#chatMessage');
+  if (!name.value.trim() || (!message.value.trim() && !pendingAttachment)) return;
+  chatMessages.unshift({name: name.value.trim(), message: message.value.trim(), time: 'Just now', attachment: pendingAttachment});
+  localStorage.setItem('dataSwarmChat', JSON.stringify(chatMessages.slice(0, 30)));
+  message.value = ''; pendingAttachment = null; document.querySelector('#attachmentPreview').textContent = ''; document.querySelector('#chatAttachment').value = '';
+  renderChat(); showToast('Message sent to Fish Friends');
+});
+let pendingAttachment = null;
+document.querySelector('#chatAttachment').addEventListener('change', event => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { pendingAttachment = {name: file.name, type: file.type || 'application/octet-stream', data: reader.result}; document.querySelector('#attachmentPreview').textContent = `Ready to send: ${file.name}`; }; reader.readAsDataURL(file); });
+document.querySelector('#addPerson').addEventListener('click', () => document.querySelector('#groupPeople').classList.toggle('open'));
+document.querySelector('#addPersonConfirm').addEventListener('click', () => { const input = document.querySelector('#personName'); if (!input.value.trim()) return; groupMembers.push(input.value.trim()); localStorage.setItem('dataSwarmGroupMembers', JSON.stringify(groupMembers)); document.querySelector('#groupMembers').textContent = `${groupMembers.length} members`; input.value = ''; document.querySelector('#groupPeople').classList.remove('open'); showToast('Person added to Fish Friends'); });
+document.querySelector('#renameGroup').addEventListener('click', () => { const name = window.prompt('Choose a group name', document.querySelector('#groupName').textContent); if (name && name.trim()) { document.querySelector('#groupName').textContent = name.trim(); showToast('Group renamed'); } });
+document.querySelector('#clearChat').addEventListener('click', () => { if (!window.confirm('Remove all messages and attachments from this device?')) return; chatMessages = []; localStorage.removeItem('dataSwarmChat'); renderChat(); showToast('Chat cleared'); });
+document.querySelector('#groupMembers').textContent = `${groupMembers.length} members`;
+renderChat();
 document.querySelector('#searchInput').addEventListener('input', renderProducts);
 document.querySelectorAll('.filter').forEach(button => button.addEventListener('click', () => { activeFilter = button.dataset.filter; document.querySelectorAll('.filter').forEach(filter => filter.classList.toggle('active', filter === button)); renderProducts(); }));
-document.querySelector('#cartButton').addEventListener('click', () => toggleCart(true));
-document.querySelector('#closeCart').addEventListener('click', () => toggleCart(false));
-document.querySelector('#drawerBackdrop').addEventListener('click', () => toggleCart(false));
-const paymentModal = document.querySelector('#paymentModal');
-const stripePaymentLink = '';
-const paypalPaymentLink = '';
-const accessCode = '00023456';
-function togglePayment(open) { paymentModal.hidden = !open; }
-document.querySelector('#checkoutButton').addEventListener('click', () => togglePayment(true));
-document.querySelector('#closePayment').addEventListener('click', () => togglePayment(false));
-paymentModal.addEventListener('click', event => { if (event.target === paymentModal) togglePayment(false); });
-document.querySelector('#paymentContinue').addEventListener('click', () => {
-  if (!stripePaymentLink) { showToast('Ask a parent or guardian to set up card payments'); return; }
-  window.location.assign(stripePaymentLink);
-});
-document.querySelector('#paypalButton').addEventListener('click', () => {
-  if (!paypalPaymentLink) { showToast('Ask a parent or guardian to set up PayPal'); return; }
-  window.location.assign(paypalPaymentLink);
-});
-document.querySelector('#redeemButton').addEventListener('click', () => {
-  redeemCreditCode(document.querySelector('#redeemCode'));
-});
-document.querySelector('#redeemCode').addEventListener('keydown', event => { if (event.key === 'Enter') redeemCreditCode(event.currentTarget); });
-document.querySelector('#creditPurchaseButton').addEventListener('click', () => {
-  const total = bag.reduce((sum, id) => sum + datasets.find(item => item.id === id).price, 0);
-  if (creditBalance < total) { showToast(`You need $${total - creditBalance} more demo credits`); return; }
-  creditBalance -= total; saveCredits(); togglePayment(false); showDownloadLibrary(); showToast('Demo credits used. Your data is ready.');
-});
-updateCreditBalance();
+document.querySelectorAll('.side-link[data-target]').forEach(link => link.addEventListener('click', () => {
+  document.querySelectorAll('.side-link').forEach(item => item.classList.toggle('active', item === link));
+  document.querySelector(`#${link.dataset.target}`).scrollIntoView({behavior: 'smooth'});
+}));
 renderProducts();
 
 const authScreen = document.querySelector('#authScreen');
 const appShell = document.querySelector('#appShell');
 const loginForm = document.querySelector('#loginForm');
+const displayNameInput = document.querySelector('#displayName');
 const emailInput = document.querySelector('#email');
 const formError = document.querySelector('#formError');
-function enterLibrary(email) {
+function enterLibrary(name, email) {
+  localStorage.setItem('dataSwarmDisplayName', name);
   localStorage.setItem('dataSwarmUser', email);
+  document.querySelector('#chatName').value = name;
   authScreen.classList.add('auth-exit');
   setTimeout(() => { authScreen.hidden = true; appShell.hidden = false; }, 420);
 }
-if (localStorage.getItem('dataSwarmUser')) enterLibrary(localStorage.getItem('dataSwarmUser'));
+const savedUser = localStorage.getItem('dataSwarmUser');
+const savedDisplayName = localStorage.getItem('dataSwarmDisplayName');
+if (savedUser) enterLibrary(savedDisplayName || savedUser.split('@')[0], savedUser);
+document.querySelector('#welcomeEmailButton').addEventListener('click', () => {
+  const email = localStorage.getItem('dataSwarmUser');
+  if (!email) return showToast('Please sign in first');
+  const name = localStorage.getItem('dataSwarmDisplayName') || 'friend';
+  const subject = encodeURIComponent('Welcome to Data Swarm');
+  const body = encodeURIComponent(`Hi ${name},\n\nWelcome to Data Swarm, your fish data library.\n\nSee you in the water!`);
+  window.location.href = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+});
+document.querySelector('#backToLogin').addEventListener('click', () => {
+  localStorage.removeItem('dataSwarmUser');
+  localStorage.removeItem('dataSwarmDisplayName');
+  appShell.hidden = true;
+  authScreen.hidden = false;
+  authScreen.classList.remove('auth-exit');
+  displayNameInput.value = '';
+  emailInput.value = '';
+  displayNameInput.focus();
+});
 loginForm.addEventListener('submit', event => {
   event.preventDefault();
+  if (!displayNameInput.value.trim()) { formError.textContent = 'Please enter your name.'; displayNameInput.focus(); return; }
   if (!emailInput.validity.valid) { formError.textContent = 'Please enter a valid email address.'; emailInput.focus(); return; }
   formError.textContent = '';
-  enterLibrary(emailInput.value.trim());
+  enterLibrary(displayNameInput.value.trim(), emailInput.value.trim());
 });
 
 const swarmCanvas = document.querySelector('#swarmCanvas');
