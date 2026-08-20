@@ -341,18 +341,58 @@ function money(value) {
   return `$${Number(value || 0).toLocaleString('en-US')}`;
 }
 
+function getCurrentEmail() {
+  return (localStorage.getItem("dataSwarmCurrentEmail") || "")
+    .trim()
+    .toLowerCase();
+}
+
+function getAccounts() {
+  try {
+    return JSON.parse(localStorage.getItem("dataSwarmAccounts") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveAccounts(accounts) {
+  localStorage.setItem(
+    "dataSwarmAccounts",
+    JSON.stringify(accounts)
+  );
+}
+
 function getBalance() {
-  return Number(localStorage.getItem('dataSwarmCredits') || 0);
+  const email = getCurrentEmail();
+
+  if (!email) return 0;
+
+  const accounts = getAccounts();
+
+  return Number(accounts[email]?.balance || 0);
 }
 
 function setBalance(amount) {
-  localStorage.setItem(
-    'dataSwarmCredits',
-    String(Math.max(0, Number(amount) || 0))
-  );
-  updateBalanceDisplay();
-}
+  const email = getCurrentEmail();
 
+  if (!email) return;
+
+  const accounts = getAccounts();
+
+  if (!accounts[email]) {
+    accounts[email] = {
+      balance: 0,
+      unlockedDatasets: []
+    };
+  }
+
+  accounts[email].balance = Math.max(
+    0,
+    Number(amount) || 0
+  );
+
+  saveAccounts(accounts);
+}
 function updateBalanceDisplay() {
   const balance = getBalance();
 
