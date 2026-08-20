@@ -680,6 +680,459 @@ The goal is to build a living digital library where people can explore aquatic l
 A single fish is only one piece of the ecosystem.
 
 A single observation is only one piece of the dataset.
+# Security and Payment Protection
+
+Security is an important part of the Data Swarm project.
+
+Data Swarm is designed with the goal of keeping the website, datasets, user interactions, and future payment functionality as safe as possible.
+
+The project uses several security concepts to help protect its code and data.
+
+---
+
+# SHA-256 Integrity Verification
+
+Data Swarm can use SHA-256 hashes to verify the integrity of important files.
+
+SHA-256 is a cryptographic hashing algorithm.
+
+It takes a file or piece of data and produces a fixed-length hash.
+
+For example:
+
+```text
+File
+    |
+    v
+SHA-256
+    |
+    v
+64-character hash
+```
+
+If even a small part of the original file changes, its SHA-256 hash will normally change completely.
+
+This makes SHA-256 useful for checking whether a file has been modified.
+
+For example:
+
+```text
+Original file
+      |
+      v
+SHA-256
+      |
+      v
+ABC123...
+```
+
+If the same file is downloaded later:
+
+```text
+Downloaded file
+      |
+      v
+SHA-256
+      |
+      v
+ABC123...
+```
+
+If the trusted hash and calculated hash match, the file has the same contents as the file that produced the trusted hash.
+
+---
+
+# What SHA-256 Protects Against
+
+SHA-256 is useful for verifying file integrity.
+
+It can help detect:
+
+* Unexpected file changes
+* Corrupted downloads
+* Modified datasets
+* Unexpected changes to published files
+* Differences between a trusted file and a downloaded file
+
+For example, Data Swarm could publish a SHA-256 hash alongside a dataset.
+
+A user could calculate the hash of the downloaded dataset and compare the result with the published value.
+
+If the values match, the downloaded file matches the published file.
+
+---
+
+# What SHA-256 Does NOT Do
+
+SHA-256 should not be described as an antivirus system.
+
+A matching SHA-256 hash does not automatically prove that a file is safe.
+
+For example, if someone intentionally publishes malicious software and publishes its SHA-256 hash, the hash will still match that malicious file.
+
+Therefore:
+
+SHA-256 verifies integrity.
+
+It does not determine whether software is malicious.
+
+Data Swarm should therefore use SHA-256 as one security layer rather than claiming that it guarantees that files contain no viruses.
+
+---
+
+# Code Integrity
+
+Important Data Swarm files can be checked using cryptographic hashes.
+
+For example:
+
+```text
+app.js
+index.html
+style.css
+dataset files
+```
+
+A trusted SHA-256 value can be recorded for a published version.
+
+When a file is updated, its hash changes.
+
+This allows different versions of a file to be distinguished.
+
+Example:
+
+```text
+Data Swarm v1
+SHA-256:
+[trusted hash]
+
+Data Swarm v2
+SHA-256:
+[different trusted hash]
+```
+
+This makes it easier to identify which exact version of a file is being used.
+
+---
+
+# How We Approach Software Safety
+
+Data Swarm should not rely on a single security mechanism.
+
+A safer development process includes multiple layers.
+
+These can include:
+
+1. Keeping dependencies updated.
+2. Reviewing code before publishing.
+3. Avoiding unnecessary third-party scripts.
+4. Using HTTPS when the website is deployed.
+5. Validating user input.
+6. Avoiding the storage of sensitive information in browser code.
+7. Scanning downloadable files with appropriate security software.
+8. Using cryptographic hashes for integrity verification.
+9. Keeping private credentials outside publicly accessible source code.
+10. Reviewing changes before deploying them.
+
+Security is therefore treated as a process rather than a single feature.
+
+---
+
+# Payment Security
+
+Payment security is especially important.
+
+A website should never attempt to implement a real payment system by simply placing payment-card information inside JavaScript.
+
+Data Swarm should not store:
+
+* Card numbers
+* Card security codes
+* Payment passwords
+* Banking credentials
+
+inside publicly accessible frontend code.
+
+Frontend JavaScript can be viewed by anyone who visits the website.
+
+Therefore, secret payment information must never be placed inside `app.js`.
+
+---
+
+# How a Secure Payment System Should Work
+
+For a real production payment system, payment processing should be handled by a trusted payment provider.
+
+The general architecture is:
+
+```text
+User
+ |
+ v
+Data Swarm
+ |
+ v
+Secure Payment Provider
+ |
+ v
+Payment Processing
+ |
+ v
+Payment Result
+ |
+ v
+Data Swarm Server
+```
+
+The website should receive confirmation of the payment rather than directly handling sensitive card information.
+
+A secure production implementation would normally use:
+
+* HTTPS
+* A trusted payment provider
+* Server-side verification
+* Authentication where appropriate
+* Secure sessions
+* Webhook verification
+* Environment variables for secrets
+* Access controls
+* Logging and monitoring
+
+---
+
+# Never Put Secrets in app.js
+
+One of the most important security rules for a frontend project is:
+
+```text
+NEVER PUT PRIVATE API KEYS OR PAYMENT SECRETS IN app.js
+```
+
+Anything placed in frontend JavaScript can potentially be viewed by users.
+
+For example, this would be unsafe:
+
+```js
+const SECRET_API_KEY = "private-secret-key";
+```
+
+A secret like this should not be published in a GitHub repository.
+
+Production secrets should instead be stored securely on the server or through the appropriate deployment platform's secret-management system.
+
+---
+
+# Demo Credits
+
+If Data Swarm contains a demo balance or demo credits system, those credits should be clearly identified as fictional.
+
+Demo credits are useful for demonstrating the user interface and testing the application.
+
+They should not be represented as real money.
+
+A demo system can simulate:
+
+```text
+Add demo credits
+        |
+        v
+User balance
+        |
+        v
+Unlock dataset
+        |
+        v
+Download dataset
+```
+
+This allows the payment interface to be demonstrated without storing real financial information.
+
+---
+
+# Client-Side Security
+
+Data Swarm is currently a web project, which means much of its frontend code can be inspected by visitors.
+
+This is normal for websites.
+
+Therefore, security-sensitive decisions should not depend only on JavaScript running in the browser.
+
+For example, a production application should not trust a browser to tell the server:
+
+```text
+"I paid."
+```
+
+Instead, the server should independently verify the payment with the payment provider.
+
+The browser should be treated as an untrusted environment.
+
+---
+
+# HTTPS
+
+The deployed Data Swarm website uses HTTPS through its hosting platform.
+
+HTTPS encrypts communication between the browser and the website.
+
+This helps protect information while it travels between the user's browser and the server.
+
+HTTPS is particularly important for websites that eventually handle authentication or payment-related operations.
+
+---
+
+# Virus and Malware Protection
+
+Data Swarm should not claim that SHA-256 alone proves that the project contains no viruses.
+
+Instead, the project can use several practices to reduce risk:
+
+* Review source code before deployment.
+* Avoid unknown third-party scripts.
+* Keep dependencies updated.
+* Scan downloaded files when appropriate.
+* Use trusted sources for datasets and images.
+* Verify file integrity with SHA-256.
+* Avoid publishing private credentials.
+* Review GitHub changes before merging them.
+
+These practices provide a stronger security approach than relying on a single hash.
+
+---
+
+# Security Philosophy
+
+Data Swarm follows an important principle:
+
+> Security should be built into the architecture rather than added at the end.
+
+The project is intended to become safer as it grows.
+
+As additional features are introduced, security requirements should be reviewed again.
+
+This is especially important if Data Swarm eventually introduces:
+
+* User accounts
+* Databases
+* Real payments
+* Private datasets
+* APIs
+* User-generated content
+* Server-side services
+
+---
+
+# Future Security Improvements
+
+As Data Swarm develops, possible security improvements include:
+
+## Server-Side Authentication
+
+Move authentication and authorization decisions to a secure backend.
+
+## Secure Payment Integration
+
+Use a reputable payment provider rather than handling card information directly.
+
+## Database Security
+
+Protect databases using authentication, authorization, validation, and appropriate access controls.
+
+## API Security
+
+Use authentication, rate limiting, validation, and secure server-side configuration.
+
+## File Integrity
+
+Publish SHA-256 checksums for important downloadable datasets and releases.
+
+## Dependency Security
+
+Regularly review dependencies for known vulnerabilities.
+
+## Security Testing
+
+Perform security testing before major releases.
+
+---
+
+# The Important Difference
+
+Data Swarm does not claim:
+
+```text
+SHA-256 = No Viruses
+```
+
+Instead:
+
+```text
+SHA-256 = File Integrity Verification
+```
+
+And:
+
+```text
+Secure Payment Provider
++
+HTTPS
++
+Server-Side Verification
++
+Secure Secret Management
++
+Security Testing
+=
+A Stronger Payment Security Architecture
+```
+
+No security system can honestly guarantee that software is completely free of every possible vulnerability or malicious modification.
+
+The goal is to continuously reduce risk, verify important components, and follow established security practices.
+
+---
+
+# Data Swarm Security Goal
+
+The goal of Data Swarm security is to protect the integrity of the project while keeping the platform safe and trustworthy as it grows.
+
+Security is not just about hiding code.
+
+It is about making sure that:
+
+* Data can be verified.
+* Files can be checked for unexpected changes.
+* Secrets remain private.
+* Payments are handled by appropriate systems.
+* User input is treated carefully.
+* The frontend is not trusted with sensitive decisions.
+* Software is reviewed before deployment.
+* Security improves as the project evolves.
+
+Data Swarm is designed to grow responsibly, with security becoming a core part of future development.
+
+---
+
+# Security Summary
+
+Data Swarm uses the following security principles:
+
+| Security Area        | Approach                                          |
+| -------------------- | ------------------------------------------------- |
+| File integrity       | SHA-256 verification                              |
+| Website connection   | HTTPS                                             |
+| Payment processing   | Trusted payment provider for future real payments |
+| Private secrets      | Never publish them in frontend code               |
+| User input           | Validate and sanitize                             |
+| Downloads            | Verify sources and integrity                      |
+| Dependencies         | Keep them reviewed and updated                    |
+| Frontend             | Treat browser code as public                      |
+| Payment confirmation | Server-side verification                          |
+| Malware protection   | Code review and appropriate scanning              |
+
+The purpose of these measures is not to claim perfect security.
+
+The purpose is to build Data Swarm using responsible security practices and to improve those practices as the project grows.
 
 But when millions of pieces come together, they can tell a story.
 
